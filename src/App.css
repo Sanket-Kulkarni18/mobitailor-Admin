@@ -19,7 +19,7 @@ div img {
   height: 16em;
 }
 
- img {
+img {
   margin: 20px 0;
   width: 13em;
   height: 15em;
@@ -84,14 +84,25 @@ a i {
   opacity: 1;
 }
 
-body{
-  background-color:#ff9acc;
+body {
+  background-color: #ff9acc;
+  overflow: hidden;
 }
 
-.foot{
+.heading-navbar {
+  padding: 0.4em;
+}
+
+.foot {
   position: relative;
   padding: 2px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.shops-list {
+  max-height: 86vh;
+  overflow: auto;
+  margin: 0.4em 0;
 }
