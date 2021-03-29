@@ -5,6 +5,7 @@ import { Col, ListGroup, ListGroupItem, Row, Spinner } from "reactstrap";
 import ShopDetails from "./ShopDetails";
 import { useHistory } from "react-router";
 import ShopCard from "./ShopCard";
+import Modal from "@material-ui/core/Modal";
 
 function Adminpanel() {
   const history = useHistory();
@@ -24,44 +25,49 @@ function Adminpanel() {
   }, []);
 
   const getAllShopsData = () => {
-    usersRef.on("value", (snapshot) => {
-      if (snapshot.exists()) {
-        let data = snapshot.val();
-        console.log(data);
-        let shopData = [];
-        for (const [shopId, shopObj] of Object.entries(data)) {
-          shopData.push({
-            shopId,
-            Profile: {
-              shopName: shopObj.Profile?.shopName
-                ? shopObj.Profile?.shopName
-                : "unknown",
-              ownerName: shopObj.Profile?.ownerName
-                ? shopObj.Profile?.ownerName
-                : "unknown",
-              ownerMobile: shopObj.Profile?.ownerMobile
-                ? shopObj.Profile?.ownerMobile
-                : "unknown",
-            },
-            PaymentDetails: {
-              limit: shopObj.PaymentDetails?.limit
-                ? shopObj.PaymentDetails?.limit
-                : "unknown",
-              paidMember: shopObj.PaymentDetails?.paidMember
-                ? shopObj.PaymentDetails?.paidMember
-                : "unknown",
-              registrationDate: shopObj.PaymentDetails?.registrationDate
-                ? shopObj.PaymentDetails?.registrationDate
-                : "unknown",
-            },
-          });
+    usersRef
+      .once("value")
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          let data = snapshot.val();
+          console.log(data);
+          let shopData = [];
+          for (const [shopId, shopObj] of Object.entries(data)) {
+            shopData.push({
+              shopId,
+              Profile: {
+                shopName: shopObj.Profile?.shopName
+                  ? shopObj.Profile?.shopName
+                  : "unknown",
+                ownerName: shopObj.Profile?.ownerName
+                  ? shopObj.Profile?.ownerName
+                  : "unknown",
+                ownerMobile: shopObj.Profile?.ownerMobile
+                  ? shopObj.Profile?.ownerMobile
+                  : "unknown",
+              },
+              PaymentDetails: {
+                limit: shopObj.PaymentDetails?.limit
+                  ? shopObj.PaymentDetails?.limit
+                  : "unknown",
+                paidMember: shopObj.PaymentDetails?.paidMember
+                  ? shopObj.PaymentDetails?.paidMember
+                  : false,
+                registrationDate: shopObj.PaymentDetails?.registrationDate
+                  ? shopObj.PaymentDetails?.registrationDate
+                  : "unknown",
+              },
+            });
+          }
+          console.log(shopData);
+          setShops(shopData);
+        } else {
+          console.error("Data not found in database!");
         }
-        console.log(shopData);
-        setShops(shopData);
-      } else {
-        console.error("Data not found in database!");
-      }
-    });
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
     setIsBuffering(false);
   };
 
