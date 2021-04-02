@@ -1,13 +1,42 @@
 import { Input, Switch, Typography } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Row, Card, Col, Label, Button } from "reactstrap";
 import { BsPencilSquare } from "react-icons/bs";
+import firebase from "firebase/app";
+import "firebase/database";
 
 const ShopDetails = ({ shopObj }) => {
   const [editShop, setEditShop] = useState(false);
   const [editPayment, setEditPayment] = useState(false);
+  const [shopName, setShopName] = useState();
+  const [ownerName, setOwnerName] = useState();
+  const [ownerMobile, setOwnerMobile] = useState();
+  const [limit, setLimit] = useState();
 
-  console.log(shopObj);
+  const profileRef=firebase.database().ref(`Users/${shopObj.shopId}/Profile`);
+
+  
+  useEffect(() => {
+    initialStates();
+  }, [])
+
+  const initialStates=()=>{
+    setShopName(shopObj.Profile?.shopName);
+    setOwnerName(shopObj.Profile?.ownerName);
+    setOwnerMobile(shopObj.Profile?.ownerMobile);
+    setLimit(shopObj.PaymentDetails?.limit);
+  };
+  const saveToDatabase=()=>{
+    shopObj.Profile={
+      shopName,
+      ownerName,
+      ownerMobile,
+    }
+    profileRef.set(shopObj.Profile)
+    .then(()=>{console.log("database");})
+    .catch(err=>console.log(err))
+  };
+
 
   return shopObj ? (
     <>
@@ -20,9 +49,18 @@ const ShopDetails = ({ shopObj }) => {
               </Col>
               <Col lg={8}>
                 {editShop ? (
-                  <Input type="text" defaultValue={shopObj.Profile?.shopName} />
-                ) : (
-                  <Typography>{shopObj.Profile?.shopName}</Typography>
+                  <Input type="text" 
+                  onChange={(e)=>{
+                    e.preventDefault();
+                    setShopName(e.target.value)
+                  }}
+                  defaultValue={shopName}
+                  value={shopName} />
+                 
+                ) : (shopName?
+                  <Typography>{shopName}</Typography>
+                  :
+                  <Typography>{shopName}</Typography>
                 )}
               </Col>
             </Row>
@@ -31,7 +69,20 @@ const ShopDetails = ({ shopObj }) => {
                 <Typography>Owner Name:</Typography>
               </Col>
               <Col lg={8}>
-                <Typography>{shopObj.Profile?.ownerName}</Typography>
+              {editShop ? (
+                  <Input type="text" 
+                  onChange={(e)=>{
+                    e.preventDefault();
+                    setOwnerName(e.target.value)
+                  }}
+                  defaultValue={ownerName}
+                  value={ownerName} />
+                 
+                ) : (ownerName?
+                  <Typography>{ownerName}</Typography>
+                  :
+                  <Typography>{ownerName}</Typography>
+                )}
               </Col>
             </Row>
             <Row>
@@ -39,7 +90,20 @@ const ShopDetails = ({ shopObj }) => {
                 <Typography>Contact:</Typography>
               </Col>
               <Col lg={8}>
-                <Typography>{shopObj.Profile?.ownerMobile}</Typography>
+              {editShop ? (
+                  <Input type="text" 
+                  onChange={(e)=>{
+                    e.preventDefault();
+                    setOwnerMobile(e.target.value)
+                  }}
+                  defaultValue={ownerMobile}
+                  value={ownerMobile} />
+                 
+                ) : (ownerName?
+                  <Typography>{ownerMobile}</Typography>
+                  :
+                  <Typography>{ownerMobile}</Typography>
+                )}
               </Col>
             </Row>
             {editShop && (
@@ -48,6 +112,7 @@ const ShopDetails = ({ shopObj }) => {
                   color="primary"
                   onClick={() => {
                     setEditShop(false);
+                    saveToDatabase();
                   }}
                 >
                   Edit
@@ -56,6 +121,7 @@ const ShopDetails = ({ shopObj }) => {
                   color="secondary"
                   onClick={() => {
                     setEditShop(false);
+                    initialStates();
                   }}
                 >
                   Cancel
